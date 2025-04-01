@@ -1,19 +1,23 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('knowledges') // 定义与数据库的表对应
-export class User {
+@Entity('Knowledge')
+export class Knowledge {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true })
-  kb_id: string;
+  kbId: string;
 
   @Column()
-  kb_name: string;
+  kbName: string;
 
   @Column()
   type: string;
 
   @Column()
   createTime: Date;
+
+  //关联用户
+  @Column()
+  username: string;
 }
