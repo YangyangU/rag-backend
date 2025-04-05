@@ -7,9 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true, // 使 .env 在全局可用
-    }),
+    ConfigModule.forRoot(),
     UserModule,
     TypeOrmModule.forRoot({
       type: 'mysql',

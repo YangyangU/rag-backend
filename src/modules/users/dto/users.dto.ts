@@ -1,7 +1,7 @@
 export class CreateUserDto {
   username: string;
   password: string;
-  role?: 'admin' | 'user' = 'user';
+  role?: 'admin' | 'user';
 }
 
 export class LoginUserDto {
