@@ -12,7 +12,7 @@ export class Knowledge {
   kbName: string;
 
   @Column()
-  type: string;
+  type: 'quick' | 'faq' | 'normal';
 
   @Column()
   createTime: Date;

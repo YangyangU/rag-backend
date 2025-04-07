@@ -13,6 +13,7 @@ import {
   GetKnowledgeDto,
   GetKnowledgeListDto,
 } from './dto/knowledges.dto';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class KnowledgeService {
@@ -22,23 +23,35 @@ export class KnowledgeService {
   ) {}
 
   async createKnowledge(createKnowledgeDto: CreateKnowledgeDto): Promise<any> {
-    const { kbId, kbName, type } = createKnowledgeDto;
+    const { kbName, type, username } = createKnowledgeDto;
+
+    const kbId = randomBytes(16).toString('hex');
+    const createTime = new Date().toISOString();
 
     // 检查用户名是否已存在
     const existingKnowledge = await this.knowledgesRepository.findOne({
       where: { kbId },
     });
     if (existingKnowledge) {
-      throw new ConflictException('知识库已存在');
+      throw new ConflictException({
+        code: 409,
+        message: '知识库已存在',
+      });
     }
 
     const knowledge = this.knowledgesRepository.create({
       kbId,
       kbName,
       type,
+      createTime,
+      username,
     });
     await this.knowledgesRepository.save(knowledge);
-    return { message: '创建成功' };
+    return {
+      code: 200,
+      message: '创建成功',
+      data: knowledge,
+    };
   }
 
   async updateKnowledge(updateKnowledgeDto: UpdateKnowledgeDto): Promise<any> {
@@ -52,7 +65,10 @@ export class KnowledgeService {
     }
 
     await this.knowledgesRepository.update(kbId, { kbName });
-    return { message: '修改成功' };
+    return {
+      code: 200,
+      message: '修改成功',
+    };
   }
 
   async deleteKnowledge(deleteKnowledgeDto: DeleteKnowledgeDto): Promise<any> {
@@ -66,7 +82,10 @@ export class KnowledgeService {
     }
 
     await this.knowledgesRepository.delete(kbId);
-    return { message: '删除成功' };
+    return {
+      code: 200,
+      message: '删除成功',
+    };
   }
 
   async getKnowledge(getKnowledgeDto: GetKnowledgeDto): Promise<any> {
@@ -76,7 +95,10 @@ export class KnowledgeService {
     });
 
     if (!knowledge) {
-      throw new UnauthorizedException('知识库不存在');
+      throw new UnauthorizedException({
+        code: 401,
+        message: '知识库不存在',
+      });
     }
 
     return knowledge;
@@ -91,7 +113,10 @@ export class KnowledgeService {
     });
 
     if (!knowledge) {
-      throw new UnauthorizedException('知识库不存在');
+      throw new UnauthorizedException({
+        code: 401,
+        message: '知识库不存在',
+      });
     }
   }
 }

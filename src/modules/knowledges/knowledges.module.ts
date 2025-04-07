@@ -10,4 +10,4 @@ import { KnowledgeController } from './knowledges.controller';
   controllers: [KnowledgeController],
   exports: [KnowledgeService],
 })
-export class UserModule {}
+export class KnowledgeModule {}

@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from './modules/chat/chat.module';
+import { KnowledgeModule } from './modules/knowledges/knowledges.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ChatModule } from './modules/chat/chat.module';
       autoLoadEntities: true,
     }),
     ChatModule,
+    KnowledgeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
