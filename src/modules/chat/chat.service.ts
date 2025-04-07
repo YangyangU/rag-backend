@@ -51,33 +51,20 @@ export class ChatService {
       // 添加当前用户消息
       messages.push({
         role: 'user',
-        content: chatRequest.message,
+        content: chatRequest.question,
       });
 
       const data = {
-        model: chatRequest.model || 'deepseek-chat',
+        model: chatRequest.model,
         messages,
         stream: true,
-        temperature: chatRequest.temperature ?? 0.7,
-        max_tokens: chatRequest.maxTokens ?? 2000,
-        ...Object.fromEntries(
-          Object.entries(chatRequest).filter(
-            ([key]) =>
-              ![
-                'message',
-                'apiKey',
-                'apiUrl',
-                'systemPrompt',
-                'historyMessages',
-                'maxContextLength',
-              ].includes(key),
-          ),
-        ),
+        temperature: chatRequest.temperature,
+        max_tokens: chatRequest.maxToken,
       };
 
       try {
         const axiosResponse = await firstValueFrom(
-          this.httpService.post(chatRequest.apiUrl, data, {
+          this.httpService.post(chatRequest.apiBase, data, {
             headers,
             responseType: 'stream',
           }),

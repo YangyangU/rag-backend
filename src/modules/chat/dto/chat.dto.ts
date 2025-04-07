@@ -3,12 +3,12 @@ export interface Message {
   content: string;
 }
 export class ChatRequestDto {
-  message: string;
+  question: string;
   apiKey: string;
-  apiUrl: string;
+  apiBase: string;
   model?: string;
   temperature?: number;
-  maxTokens?: number;
+  maxToken?: number;
   systemPrompt?: string;
   historyMessages?: Message[]; // 历史消息数组
   maxContextLength?: number;
