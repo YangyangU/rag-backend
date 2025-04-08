@@ -2,11 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Response } from 'express';
-import { ChatRequestDto, Message } from './dto/chat.dto';
+import {
+  ChatRequestDto,
+  Message,
+  CreateChatMessagesDto,
+  GetChatMessagesDto,
+} from './dto/chat.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Knowledge } from '../knowledges/entities/knowledge.entity';
+import { ChatRecord } from './entities/chat.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ChatService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+
+    @InjectRepository(ChatRecord)
+    private readonly chatRecordRepository: Repository<ChatRecord>,
+
+    @InjectRepository(Knowledge)
+    private readonly knowledgesRepository: Repository<Knowledge>,
+  ) {}
 
   async streamChat(
     chatRequest: ChatRequestDto,
@@ -135,5 +152,63 @@ export class ChatService {
       );
       response.end();
     }
+  }
+  async saveChatRecords(createChatMessages: CreateChatMessagesDto) {
+    const { kbId, username, messages } = createChatMessages;
+
+    // 查找知识库
+    const knowledge = await this.knowledgesRepository.findOneBy({ kbId });
+    if (!knowledge) {
+      return { code: 404, message: '知识库不存在' };
+    }
+
+    // 查找现有记录（按最新会话）
+    let record = await this.chatRecordRepository.findOne({
+      where: { kbId, username },
+      order: { id: 'DESC' }, // 获取最新记录
+    });
+
+    // 存在则追加，不存在则创建
+    if (record) {
+      // 合并消息（避免重复）
+      const existingMessages = record.messages || [];
+      const newMessages = messages.filter(
+        (newMsg) =>
+          !existingMessages.some(
+            (existMsg) => existMsg.question === newMsg.question,
+          ),
+      );
+
+      record.messages = [...existingMessages, ...newMessages];
+      record = await this.chatRecordRepository.save(record);
+    } else {
+      record = await this.chatRecordRepository.save({
+        kbId,
+        username,
+        messages,
+      });
+    }
+
+    return {
+      code: 200,
+      message: '保存成功',
+    };
+  }
+
+  async getChatRecords(getChatMessages: GetChatMessagesDto) {
+    const { kbId, username } = getChatMessages;
+
+    const recordList = await this.chatRecordRepository.find({
+      where: { kbId, username },
+      order: { id: 'DESC' },
+    });
+    return {
+      code: 200,
+      message: '获取成功',
+      data: {
+        recordList: recordList.flatMap((record) => record.messages),
+      },
+      count: recordList.length || 0,
+    };
   }
 }

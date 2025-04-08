@@ -2,9 +2,10 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Knowledge } from './entities/knowledge.entity';
 import {
   CreateKnowledgeDto,
@@ -61,7 +62,10 @@ export class KnowledgeService {
     });
 
     if (!knowledge) {
-      throw new UnauthorizedException('知识库不存在');
+      throw new UnauthorizedException({
+        code: 401,
+        message: '知识库不存在',
+      });
     }
 
     await this.knowledgesRepository.update(kbId, { kbName });
@@ -72,16 +76,23 @@ export class KnowledgeService {
   }
 
   async deleteKnowledge(deleteKnowledgeDto: DeleteKnowledgeDto): Promise<any> {
-    const { kbId } = deleteKnowledgeDto;
-    const knowledge = await this.knowledgesRepository.findOne({
-      where: { kbId },
+    const { kbIds } = deleteKnowledgeDto;
+
+    const existingCount = await this.knowledgesRepository.count({
+      where: { kbId: In(kbIds) },
     });
 
-    if (!knowledge) {
-      throw new UnauthorizedException('知识库不存在');
+    if (existingCount !== kbIds.length) {
+      throw new NotFoundException({
+        code: 404,
+        message: '部分知识库不存在',
+        details: `请求删除 ${kbIds.length} 条，实际找到 ${existingCount} 条`,
+      });
     }
+    await this.knowledgesRepository.manager.transaction(async (manager) => {
+      await manager.delete(Knowledge, { kbId: In(kbIds) });
+    });
 
-    await this.knowledgesRepository.delete(kbId);
     return {
       code: 200,
       message: '删除成功',
@@ -101,22 +112,26 @@ export class KnowledgeService {
       });
     }
 
-    return knowledge;
+    return {
+      code: 200,
+      message: '查询成功',
+      data: knowledge,
+    };
   }
 
   async getKnowledgeList(
     getKnowledgeListDto: GetKnowledgeListDto,
   ): Promise<any> {
     const { username, type } = getKnowledgeListDto;
-    const knowledge = await this.knowledgesRepository.find({
+    const knowledgeList = await this.knowledgesRepository.find({
       where: { username, type },
     });
 
-    if (!knowledge) {
-      throw new UnauthorizedException({
-        code: 401,
-        message: '知识库不存在',
-      });
-    }
+    return {
+      code: 200,
+      message: '查询成功',
+      data: knowledgeList,
+      count: knowledgeList.length,
+    };
   }
 }

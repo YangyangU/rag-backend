@@ -15,7 +15,7 @@ export class GetKnowledgeDto {
 }
 
 export class DeleteKnowledgeDto {
-  kbId: string;
+  kbIds: [string];
 }
 
 export class GetKnowledgeListDto {

@@ -1,7 +1,11 @@
 import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 import { ChatService } from './chat.service';
-import { ChatRequestDto } from './dto/chat.dto';
+import {
+  ChatRequestDto,
+  CreateChatMessagesDto,
+  GetChatMessagesDto,
+} from './dto/chat.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -20,5 +24,15 @@ export class ChatController {
         details: error.message,
       });
     }
+  }
+
+  @Post('createRecords')
+  async createRecords(@Body() createChatMessages: CreateChatMessagesDto) {
+    return await this.chatService.saveChatRecords(createChatMessages);
+  }
+
+  @Post('getRecords')
+  async getRecords(@Body() getChatMessages: GetChatMessagesDto) {
+    return await this.chatService.getChatRecords(getChatMessages);
   }
 }
