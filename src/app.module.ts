@@ -6,6 +6,7 @@ import { UserModule } from './modules/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from './modules/chat/chat.module';
 import { KnowledgeModule } from './modules/knowledges/knowledges.module';
+import { FileModule } from './modules/files/files.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { KnowledgeModule } from './modules/knowledges/knowledges.module';
     }),
     ChatModule,
     KnowledgeModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
