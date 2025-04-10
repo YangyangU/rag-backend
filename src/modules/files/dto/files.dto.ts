@@ -6,5 +6,5 @@ export class GetFilesDto {
 }
 
 export class DeleteFilesDto {
-  fileName: [string];
+  fileNames: string[];
 }

@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { File } from './entities/file.entity';
 import { Knowledge } from '../knowledges/entities/knowledge.entity';
 import { UploadFileDto, GetFilesDto, DeleteFilesDto } from './dto/files.dto';
@@ -53,14 +53,14 @@ export class FilesService {
     });
     return {
       code: 200,
-      message: '删除成功',
+      message: '获取成功',
       data: files,
     };
   }
 
   async deleteFiles(deleteFiles: DeleteFilesDto): Promise<any> {
-    const { fileName } = deleteFiles;
-    await this.fileRepository.delete(fileName);
+    const { fileNames } = deleteFiles;
+    await this.fileRepository.delete({ fileName: In(fileNames) });
     return {
       code: 200,
       message: '删除成功',
