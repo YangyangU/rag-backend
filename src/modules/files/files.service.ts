@@ -3,7 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { File } from './entities/file.entity';
 import { Knowledge } from '../knowledges/entities/knowledge.entity';
-import { UploadFileDto, GetFilesDto, DeleteFilesDto } from './dto/files.dto';
+import { existsSync, readFileSync } from 'fs';
+import {
+  UploadFileDto,
+  GetFilesDto,
+  DeleteFilesDto,
+  GetFileBase64Dto,
+} from './dto/files.dto';
+import { getMimeType } from '../../common/utils';
 
 @Injectable()
 export class FilesService {
@@ -64,6 +71,36 @@ export class FilesService {
     return {
       code: 200,
       message: '删除成功',
+    };
+  }
+
+  getFileBase64(getFileBase64: GetFileBase64Dto): any {
+    const { fileName } = getFileBase64;
+    const filePath = `./uploads/${fileName}`;
+    if (!existsSync(filePath)) {
+      throw new BadRequestException({
+        code: '404',
+        message: '文件不存在',
+      });
+    }
+
+    const fileExt = fileName.split('.')[1].toLowerCase();
+
+    // 根据文件后缀判断 MIME 类型
+    const mimeType = getMimeType(fileExt);
+
+    // 读取文件并转换为 base64
+    const fileData = readFileSync(filePath);
+    const base64Data = fileData.toString('base64');
+
+    return {
+      code: 200,
+      message: '获取成功',
+      data: {
+        fileName,
+        ext: fileExt,
+        base64: `data:${mimeType};base64,${base64Data}`,
+      },
     };
   }
 }

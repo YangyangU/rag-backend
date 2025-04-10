@@ -8,3 +8,7 @@ export class GetFilesDto {
 export class DeleteFilesDto {
   fileNames: string[];
 }
+
+export class GetFileBase64Dto {
+  fileName: string;
+}

@@ -9,7 +9,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { UploadFileDto, GetFilesDto, DeleteFilesDto } from './dto/files.dto';
+import {
+  UploadFileDto,
+  GetFilesDto,
+  DeleteFilesDto,
+  GetFileBase64Dto,
+} from './dto/files.dto';
 
 @Controller('files')
 export class FilesController {
@@ -52,5 +57,10 @@ export class FilesController {
   @Post('deletFiles')
   async deleteFiles(@Body() deleteFiles: DeleteFilesDto) {
     return await this.filesService.deleteFiles(deleteFiles);
+  }
+
+  @Post('getFileBase64')
+  async getFileBase64(@Body() getFileBase64: GetFileBase64Dto) {
+    return await this.filesService.getFileBase64(getFileBase64);
   }
 }
