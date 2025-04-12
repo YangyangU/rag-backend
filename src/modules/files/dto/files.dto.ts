@@ -9,6 +9,6 @@ export class DeleteFilesDto {
   fileNames: string[];
 }
 
-export class GetFileBase64Dto {
+export class GetFileContentDto {
   fileName: string;
 }

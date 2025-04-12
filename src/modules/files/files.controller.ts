@@ -13,7 +13,7 @@ import {
   UploadFileDto,
   GetFilesDto,
   DeleteFilesDto,
-  GetFileBase64Dto,
+  GetFileContentDto,
 } from './dto/files.dto';
 
 @Controller('files')
@@ -59,8 +59,8 @@ export class FilesController {
     return await this.filesService.deleteFiles(deleteFiles);
   }
 
-  @Post('getFileBase64')
-  async getFileBase64(@Body() getFileBase64: GetFileBase64Dto) {
-    return await this.filesService.getFileBase64(getFileBase64);
+  @Post('getFileContent')
+  async getFileContent(@Body() getFileContent: GetFileContentDto) {
+    return await this.filesService.getFileContent(getFileContent);
   }
 }
