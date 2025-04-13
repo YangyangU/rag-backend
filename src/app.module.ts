@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from './modules/chat/chat.module';
 import { KnowledgeModule } from './modules/knowledges/knowledges.module';
 import { FileModule } from './modules/files/files.module';
+import { BotModule } from './modules/bots/bots.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { FileModule } from './modules/files/files.module';
     ChatModule,
     KnowledgeModule,
     FileModule,
+    BotModule,
   ],
   controllers: [AppController],
   providers: [AppService],

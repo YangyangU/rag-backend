@@ -85,7 +85,14 @@ export class FilesService {
         message: '文件不存在',
       });
     }
-    const filePath = path.join(__dirname, '..', '..', 'uploads', fileName);
+    const filePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'uploads',
+      fileName,
+    );
     const content = fs.readFileSync(filePath, 'utf-8');
     return {
       code: 200,
