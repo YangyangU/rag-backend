@@ -64,7 +64,16 @@ export class BotsService {
   }
 
   async updateBotInfo(updateBotInfoDto: UpdateBotInfoDto) {
-    const { botId, botName, introduction, avatar, kbIds } = updateBotInfoDto;
+    const {
+      botId,
+      botName,
+      introduction,
+      avatar,
+      kbIds,
+      welcomeMessage,
+      roleSetting,
+      chatSetting,
+    } = updateBotInfoDto;
     const bot = await this.botRepository.findOne({
       where: { botId },
     });
@@ -79,6 +88,10 @@ export class BotsService {
     bot.introduction = introduction;
     bot.avatar = avatar;
     bot.kbIds = kbIds;
+    bot.welcomeMessage = welcomeMessage;
+    bot.roleSetting = roleSetting;
+    bot.chatSetting = chatSetting;
+
     await this.botRepository.save(bot);
 
     return {

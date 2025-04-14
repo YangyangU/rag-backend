@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { IChatSetting } from '../dto/bots.dto';
 
 @Entity()
 export class Bot {
@@ -22,4 +23,13 @@ export class Bot {
 
   @Column('simple-array')
   kbIds: string[];
+
+  @Column()
+  welcomeMessage: string;
+
+  @Column()
+  roleSetting: string;
+
+  @Column('json')
+  chatSetting: IChatSetting;
 }
