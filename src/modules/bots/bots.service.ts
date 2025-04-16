@@ -26,6 +26,9 @@ export class BotsService {
       botId: randomBytes(16).toString('hex'),
       avatar: `/avatars/${file.filename}`,
       kbIds: [],
+      welcomeMessage: '',
+      roleSetting: '',
+      chatSetting: {},
       ...createBot,
     });
     await this.botRepository.save(bot);

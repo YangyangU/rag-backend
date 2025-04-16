@@ -9,6 +9,7 @@ export class GetBotListDto {
 export class CreateBotDto {
   botName: string;
   introduction: string;
+  username: string;
 }
 
 export class UpdateBotInfoDto {
