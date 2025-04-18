@@ -12,6 +12,19 @@ export class ChatRequestDto {
   systemPrompt?: string;
   historyMessages?: Message[]; // 历史消息数组
   maxContextLength?: number;
+  apiContextLength?: number;
+  stream?: boolean;
+  context?: number;
+  chunkSize?: number;
+  kbIds?: string[];
+  botId?: string;
+  top_p?: number;
+  capabilities?: {
+    networkSearch: boolean;
+    mixedSearch: boolean;
+    rerank: boolean;
+    onlySearch: boolean;
+  };
 }
 
 export interface ChatMessage {

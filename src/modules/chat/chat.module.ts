@@ -5,6 +5,7 @@ import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatRecord } from '../chat/entities/chat.entity';
 import { Knowledge } from '../knowledges/entities/knowledge.entity';
+import { Bot } from '../bots/entities/bot.entity';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { Knowledge } from '../knowledges/entities/knowledge.entity';
       timeout: 60000,
       maxRedirects: 3,
     }),
-    TypeOrmModule.forFeature([ChatRecord, Knowledge]),
+    TypeOrmModule.forFeature([ChatRecord, Knowledge, Bot]),
   ],
   controllers: [ChatController],
   providers: [ChatService],

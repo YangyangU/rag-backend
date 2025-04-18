@@ -47,7 +47,7 @@ export interface IChatSetting {
   /* 自定义的模型名称，只有自定义时候用 */
   modelName?: string;
   /* 秘钥，openAI用 */
-  apiKey?: string;
+  apiKey: string;
   /* api路径 */
   apiBase: string;
   /* 模型名称 */

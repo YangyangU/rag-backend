@@ -10,6 +10,7 @@ import {
 } from './dto/chat.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Knowledge } from '../knowledges/entities/knowledge.entity';
+import { Bot } from '../bots/entities/bot.entity';
 import { ChatRecord } from './entities/chat.entity';
 import { Repository } from 'typeorm';
 
@@ -23,6 +24,9 @@ export class ChatService {
 
     @InjectRepository(Knowledge)
     private readonly knowledgesRepository: Repository<Knowledge>,
+
+    @InjectRepository(Bot)
+    private readonly botRepository: Repository<Bot>,
   ) {}
 
   async streamChat(
@@ -38,8 +42,35 @@ export class ChatService {
 
       const headers = {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${chatRequest.apiKey}`,
       };
+
+      let apiBase = chatRequest.apiBase;
+      let apiKey = chatRequest.apiKey;
+      let model = chatRequest.model;
+      let temperature = chatRequest.temperature;
+      let maxToken = chatRequest.maxToken;
+      let top_p = chatRequest.top_p;
+      let capabilities = chatRequest.capabilities;
+
+      // 如果携带了botId，查询Bot的模型配置信息
+      if (chatRequest.botId) {
+        const bot = await this.botRepository.findOne({
+          where: { botId: chatRequest.botId },
+        });
+        if (bot && bot.chatSetting) {
+          apiBase = bot.chatSetting.apiBase;
+          apiKey = bot.chatSetting.apiKey;
+          model = bot.chatSetting.apiModelName;
+          temperature = bot.chatSetting.temperature;
+          maxToken = bot.chatSetting.maxToken;
+          top_p = bot.chatSetting.top_P;
+          capabilities = bot.chatSetting.capabilities;
+        }
+      }
+
+      if (apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
 
       // 构建消息数组
       let messages: Array<Message> = [];
@@ -54,10 +85,10 @@ export class ChatService {
 
       // 添加历史消息（如果有）
       if (chatRequest.historyMessages?.length) {
-        const startIndex = chatRequest.maxContextLength
+        const startIndex = chatRequest.context
           ? Math.max(
               0,
-              chatRequest.historyMessages.length - chatRequest.maxContextLength,
+              chatRequest.historyMessages.length - chatRequest.context,
             )
           : 0;
         messages = messages.concat(
@@ -72,16 +103,18 @@ export class ChatService {
       });
 
       const data = {
-        model: chatRequest.model,
+        model,
         messages,
-        stream: true,
-        temperature: chatRequest.temperature,
-        max_tokens: chatRequest.maxToken,
+        stream: chatRequest.stream,
+        temperature,
+        max_tokens: maxToken,
+        top_p,
+        ...capabilities,
       };
 
       try {
         const axiosResponse = await firstValueFrom(
-          this.httpService.post(chatRequest.apiBase, data, {
+          this.httpService.post(apiBase, data, {
             headers,
             responseType: 'stream',
           }),
