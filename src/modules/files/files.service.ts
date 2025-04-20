@@ -8,9 +8,11 @@ import {
   GetFilesDto,
   DeleteFilesDto,
   GetFileContentDto,
+  GetFileContentByKbIdsDto,
 } from './dto/files.dto';
 import * as fs from 'fs';
 import * as path from 'path';
+import { extractFileContent } from '../../common/fileParser';
 
 @Injectable()
 export class FilesService {
@@ -37,6 +39,9 @@ export class FilesService {
       });
     }
 
+    // 解析文件内容
+    const content = await extractFileContent(file.path);
+
     const newFile = this.fileRepository.create({
       originalName: file.originalname,
       fileName: file.filename,
@@ -44,6 +49,7 @@ export class FilesService {
       fileSize: file.size,
       mimeType: file.mimetype,
       kbId,
+      content,
     });
 
     return {
@@ -68,6 +74,19 @@ export class FilesService {
   async deleteFiles(deleteFiles: DeleteFilesDto): Promise<any> {
     const { fileNames } = deleteFiles;
     await this.fileRepository.delete({ fileName: In(fileNames) });
+    //删除对应的文件
+    fileNames.forEach((fileName) => {
+      const filePath = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'uploads',
+        'files',
+        fileName,
+      );
+      fs.unlinkSync(filePath);
+    });
     return {
       code: 200,
       message: '删除成功',
@@ -91,6 +110,7 @@ export class FilesService {
       '..',
       '..',
       'uploads',
+      'files',
       fileName,
     );
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -99,5 +119,17 @@ export class FilesService {
       message: '获取成功',
       data: content,
     };
+  }
+
+  async getFileContentByIds(
+    getFileContentByIds: GetFileContentByKbIdsDto,
+  ): Promise<any> {
+    const { kbIds } = getFileContentByIds;
+    const files = await this.fileRepository.find({
+      where: { kbId: In(kbIds) },
+    });
+    const contents = files.map((file) => file.content);
+
+    return contents;
   }
 }

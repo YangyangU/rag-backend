@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatRecord } from '../chat/entities/chat.entity';
 import { Knowledge } from '../knowledges/entities/knowledge.entity';
 import { Bot } from '../bots/entities/bot.entity';
+import { FileModule } from '../files/files.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { Bot } from '../bots/entities/bot.entity';
       maxRedirects: 3,
     }),
     TypeOrmModule.forFeature([ChatRecord, Knowledge, Bot]),
+    FileModule,
   ],
   controllers: [ChatController],
   providers: [ChatService],

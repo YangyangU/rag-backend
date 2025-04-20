@@ -12,6 +12,7 @@ import {
   GetFilesDto,
   DeleteFilesDto,
   GetFileContentDto,
+  GetFileContentByKbIdsDto,
 } from './dto/files.dto';
 import { fileMulterConfig } from 'src/config/multer.config';
 
@@ -33,7 +34,7 @@ export class FilesController {
     return await this.filesService.getFiles(getFiles);
   }
 
-  @Post('deletFiles')
+  @Post('deleteFiles')
   async deleteFiles(@Body() deleteFiles: DeleteFilesDto) {
     return await this.filesService.deleteFiles(deleteFiles);
   }
@@ -41,5 +42,12 @@ export class FilesController {
   @Post('getFileContent')
   async getFileContent(@Body() getFileContent: GetFileContentDto) {
     return await this.filesService.getFileContent(getFileContent);
+  }
+
+  @Post('getFileContentByIds')
+  async getFileContentByIds(
+    @Body() getFileContentByIds: GetFileContentByKbIdsDto,
+  ) {
+    return await this.filesService.getFileContentByIds(getFileContentByIds);
   }
 }

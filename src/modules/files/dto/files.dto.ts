@@ -12,3 +12,7 @@ export class DeleteFilesDto {
 export class GetFileContentDto {
   fileName: string;
 }
+
+export class GetFileContentByKbIdsDto {
+  kbIds: string[];
+}

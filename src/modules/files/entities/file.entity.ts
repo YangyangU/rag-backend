@@ -20,8 +20,8 @@ export class File {
   @Column()
   mimeType: string;
 
-  @Column({ nullable: true })
-  description: string;
+  @Column()
+  content: string;
 
   @Column()
   kbId: string;

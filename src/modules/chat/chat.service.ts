@@ -13,6 +13,7 @@ import { Knowledge } from '../knowledges/entities/knowledge.entity';
 import { Bot } from '../bots/entities/bot.entity';
 import { ChatRecord } from './entities/chat.entity';
 import { Repository } from 'typeorm';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class ChatService {
@@ -27,6 +28,8 @@ export class ChatService {
 
     @InjectRepository(Bot)
     private readonly botRepository: Repository<Bot>,
+
+    private readonly filesService: FilesService,
   ) {}
 
   async streamChat(
@@ -51,6 +54,8 @@ export class ChatService {
       let maxToken = chatRequest.maxToken;
       let top_p = chatRequest.top_p;
       let capabilities = chatRequest.capabilities;
+      let kbIds = chatRequest.kbIds;
+      let roleSetting = chatRequest.roleSetting;
 
       // 如果携带了botId，查询Bot的模型配置信息
       if (chatRequest.botId) {
@@ -65,6 +70,8 @@ export class ChatService {
           maxToken = bot.chatSetting.maxToken;
           top_p = bot.chatSetting.top_P;
           capabilities = bot.chatSetting.capabilities;
+          kbIds = bot.kbIds;
+          roleSetting = bot.roleSetting;
         }
       }
 
@@ -76,10 +83,27 @@ export class ChatService {
       let messages: Array<Message> = [];
 
       // 添加系统提示（如果有）
-      if (chatRequest.systemPrompt) {
+      if (roleSetting) {
         messages.push({
           role: 'system',
-          content: chatRequest.systemPrompt,
+          content: roleSetting,
+        });
+      }
+
+      // 如果携带kbIds，查询知识库所有文件内容
+      let fileResults: { fileName: string; content: string }[] = [];
+      if (kbIds && kbIds?.length > 0) {
+        fileResults = await this.filesService.getFileContentByIds({
+          kbIds,
+        });
+      }
+
+      // 添加检索到的文件内容作为系统提示
+      if (fileResults.length > 0) {
+        const fileContent = fileResults.map((file) => file.content).join('\n');
+        messages.push({
+          role: 'system',
+          content: `以下是相关文件内容：\n${fileContent}`,
         });
       }
 

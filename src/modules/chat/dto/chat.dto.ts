@@ -9,7 +9,8 @@ export class ChatRequestDto {
   model?: string;
   temperature?: number;
   maxToken?: number;
-  systemPrompt?: string;
+  roleSetting?: string;
+  welcomeMessage?: string;
   historyMessages?: Message[]; // 历史消息数组
   maxContextLength?: number;
   apiContextLength?: number;
