@@ -20,7 +20,7 @@ export class File {
   @Column()
   mimeType: string;
 
-  @Column()
+  @Column('longtext')
   content: string;
 
   @Column()

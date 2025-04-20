@@ -80,14 +80,12 @@ async function extractTextContent(filePath: string): Promise<string> {
   });
 }
 async function extractImageContent(filePath: string): Promise<string> {
-  const worker: any = await createWorker();
-  await worker.loadLanguage('eng+chi_sim');
-  await worker.initialize('eng+chi_sim', {
-    tessdata: '../packages/ocr',
-  });
-  const {
-    data: { text },
-  } = await worker.recognize(filePath);
-  await worker.terminate();
-  return text;
+  const worker = await createWorker();
+  try {
+    await worker.reinitialize('eng+chi_sim');
+    const { data } = await worker.recognize(filePath);
+    return data.text;
+  } finally {
+    await worker.terminate();
+  }
 }
