@@ -9,8 +9,12 @@ export class ChatRecord {
   @Column()
   username: string;
 
-  @Column()
+  //可以为空
+  @Column({ nullable: true })
   kbId: string;
+
+  @Column()
+  type: 'quick' | 'home';
 
   @Column('text', {
     transformer: {

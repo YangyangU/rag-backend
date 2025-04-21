@@ -91,7 +91,7 @@ export class ChatService {
       }
 
       // 如果携带kbIds，查询知识库所有文件内容
-      let fileResults: { fileName: string; content: string }[] = [];
+      let fileResults: string[] = [];
       if (kbIds && kbIds?.length > 0) {
         fileResults = await this.filesService.getFileContentByIds({
           kbIds,
@@ -100,7 +100,7 @@ export class ChatService {
 
       // 添加检索到的文件内容作为系统提示
       if (fileResults.length > 0) {
-        const fileContent = fileResults.map((file) => file.content).join('\n');
+        const fileContent = fileResults.join('\n');
         messages.push({
           role: 'system',
           content: `以下是相关文件内容：\n${fileContent}`,
@@ -211,19 +211,28 @@ export class ChatService {
     }
   }
   async saveChatRecords(createChatMessages: CreateChatMessagesDto) {
-    const { kbId, username, messages } = createChatMessages;
+    const { kbId, username, messages, type } = createChatMessages;
 
-    // 查找知识库
-    const knowledge = await this.knowledgesRepository.findOneBy({ kbId });
-    if (!knowledge) {
-      return { code: 404, message: '知识库不存在' };
+    let record: ChatRecord | null = null;
+
+    if (type === 'home') {
+      record = await this.chatRecordRepository.findOne({
+        where: { type, username },
+        order: { id: 'DESC' },
+      });
+    } else {
+      // 查找知识库
+      const knowledge = await this.knowledgesRepository.findOneBy({ kbId });
+      if (!knowledge) {
+        return { code: 404, message: '知识库不存在' };
+      }
+
+      // 查找现有记录（按最新会话）
+      record = await this.chatRecordRepository.findOne({
+        where: { kbId, username },
+        order: { id: 'DESC' }, // 获取最新记录
+      });
     }
-
-    // 查找现有记录（按最新会话）
-    let record = await this.chatRecordRepository.findOne({
-      where: { kbId, username },
-      order: { id: 'DESC' }, // 获取最新记录
-    });
 
     // 存在则追加，不存在则创建
     if (record) {
@@ -243,6 +252,7 @@ export class ChatService {
         kbId,
         username,
         messages,
+        type,
       });
     }
 
@@ -253,12 +263,21 @@ export class ChatService {
   }
 
   async getChatRecords(getChatMessages: GetChatMessagesDto) {
-    const { kbId, username } = getChatMessages;
+    const { kbId, username, type } = getChatMessages;
 
-    const recordList = await this.chatRecordRepository.find({
-      where: { kbId, username },
-      order: { id: 'DESC' },
-    });
+    let recordList: ChatRecord[] = [];
+    if (type === 'home') {
+      recordList = await this.chatRecordRepository.find({
+        where: { type, username },
+        order: { id: 'DESC' },
+      });
+    } else {
+      recordList = await this.chatRecordRepository.find({
+        where: { kbId, username },
+        order: { id: 'DESC' },
+      });
+    }
+
     return {
       code: 200,
       message: '获取成功',

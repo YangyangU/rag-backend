@@ -1,6 +1,6 @@
 export class CreateKnowledgeDto {
   kbName: string;
-  type: 'quick' | 'faq' | 'normal';
+  type: 'quick' | 'normal';
   username: string;
 }
 
@@ -11,7 +11,7 @@ export class UpdateKnowledgeDto {
 
 export class GetKnowledgeDto {
   kbId: string;
-  type: 'quick' | 'faq' | 'normal';
+  type: 'quick' | 'normal';
 }
 
 export class DeleteKnowledgeDto {
@@ -20,5 +20,5 @@ export class DeleteKnowledgeDto {
 
 export class GetKnowledgeListDto {
   username: string;
-  type: 'quick' | 'faq' | 'normal';
+  type: 'quick' | 'normal';
 }

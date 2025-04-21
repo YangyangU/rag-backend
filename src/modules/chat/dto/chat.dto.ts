@@ -41,11 +41,13 @@ export interface ChatMessage {
 
 export class CreateChatMessagesDto {
   username: string;
-  kbId: string;
+  kbId?: string;
   messages: ChatMessage[];
+  type: 'quick' | 'home';
 }
 
 export class GetChatMessagesDto {
-  username?: string;
+  username: string;
   kbId?: string;
+  type: 'quick' | 'home';
 }
