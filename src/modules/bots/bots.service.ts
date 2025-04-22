@@ -29,6 +29,7 @@ export class BotsService {
       welcomeMessage: '',
       roleSetting: '',
       chatSetting: {},
+      createTime: new Date().toISOString(),
       ...createBot,
     });
     await this.botRepository.save(bot);

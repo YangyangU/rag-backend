@@ -12,7 +12,7 @@ export class Knowledge {
   type: 'quick' | 'normal';
 
   @Column()
-  createTime: Date;
+  createTime: string;
 
   //关联用户
   @Column()

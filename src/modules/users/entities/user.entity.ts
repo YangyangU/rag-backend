@@ -13,4 +13,10 @@ export class User {
 
   @Column({ default: 'user' })
   role: 'admin' | 'user';
+
+  @Column()
+  createTime: string;
+
+  @Column()
+  updateTime: string;
 }

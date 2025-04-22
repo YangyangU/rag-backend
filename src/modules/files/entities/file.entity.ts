@@ -25,4 +25,7 @@ export class File {
 
   @Column()
   kbId: string;
+
+  @Column()
+  createTime: string;
 }

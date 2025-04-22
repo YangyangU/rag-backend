@@ -50,6 +50,7 @@ export class FilesService {
       mimeType: file.mimetype,
       kbId,
       content,
+      createTime: new Date().toISOString(),
     });
 
     return {

@@ -32,4 +32,7 @@ export class Bot {
 
   @Column('json')
   chatSetting: IChatSetting;
+
+  @Column()
+  createTime: string;
 }
