@@ -22,3 +22,8 @@ export class GetKnowledgeListDto {
   username: string;
   type: 'quick' | 'normal';
 }
+
+export class GetKbCountByDateDto {
+  role: 'admin' | 'user';
+  date: number;
+}

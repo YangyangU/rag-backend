@@ -27,6 +27,11 @@ export class DeleteBotDto {
   botId: string;
 }
 
+export class GetBotCountByDateDto {
+  role: 'admin' | 'user';
+  date: number;
+}
+
 type ICapabilities = {
   /* 是否联网搜索 */
   networkSearch: boolean;

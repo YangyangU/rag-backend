@@ -14,6 +14,7 @@ import {
   GetBotListDto,
   UpdateBotInfoDto,
   DeleteBotDto,
+  GetBotCountByDateDto,
 } from './dto/bots.dto';
 import { avatarMulterConfig } from 'src/config/multer.config';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -49,5 +50,10 @@ export class BotsController {
   @Post('deleteBot')
   async deleteBot(@Body() deleteBotDto: DeleteBotDto) {
     return await this.botsService.deleteBot(deleteBotDto);
+  }
+
+  @Post('getBotCountByDate')
+  async getBotCountByDate(@Body() getBotCountByDateDto: GetBotCountByDateDto) {
+    return await this.botsService.getBotCountByDate(getBotCountByDateDto);
   }
 }

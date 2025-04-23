@@ -6,6 +6,7 @@ import {
   DeleteKnowledgeDto,
   GetKnowledgeDto,
   GetKnowledgeListDto,
+  GetKbCountByDateDto,
 } from './dto/knowledges.dto';
 
 @Controller('knowledges')
@@ -35,5 +36,12 @@ export class KnowledgeController {
   @Post('getKbList')
   async getKnowledgeList(@Body() getKnowledgeListDto: GetKnowledgeListDto) {
     return this.knowledgeService.getKnowledgeList(getKnowledgeListDto);
+  }
+
+  @Post('getKbCountByDate')
+  async getKnowledgeCountByDate(
+    @Body() getKbCountByDateDto: GetKbCountByDateDto,
+  ) {
+    return this.knowledgeService.getKnowledgeCountByDate(getKbCountByDateDto);
   }
 }

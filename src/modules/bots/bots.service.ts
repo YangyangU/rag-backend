@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { Bot } from './entities/bot.entity';
 import {
   CreateBotDto,
@@ -8,6 +8,7 @@ import {
   GetBotListDto,
   UpdateBotInfoDto,
   DeleteBotDto,
+  GetBotCountByDateDto,
 } from './dto/bots.dto';
 import { randomBytes } from 'crypto';
 
@@ -121,6 +122,47 @@ export class BotsService {
     return {
       code: 200,
       message: 'Bot删除成功',
+    };
+  }
+
+  async getBotCountByDate(getBotCountByDateDto: GetBotCountByDateDto) {
+    const { role, date } = getBotCountByDateDto;
+    if (role === 'admin') {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - date);
+
+      const files = await this.botRepository.find({
+        where: {
+          createTime: MoreThanOrEqual(startDate.toISOString()),
+        },
+      });
+
+      const dateCountMap = new Map<string, number>();
+      files.forEach((file) => {
+        const date = new Date(file.createTime).toISOString().split('T')[0]; // 获取日期部分
+        if (dateCountMap.has(date)) {
+          dateCountMap.set(date, dateCountMap.get(date) ?? 0 + 1);
+        } else {
+          dateCountMap.set(date, 1);
+        }
+      });
+
+      // 转换为指定格式
+      const result = Array.from(dateCountMap).map(([name, value]) => ({
+        name,
+        value,
+      }));
+
+      return {
+        code: 200,
+        message: '获取bot数量成功',
+        data: result,
+      };
+    }
+
+    return {
+      code: 403,
+      message: '无权访问bot统计信息',
     };
   }
 }

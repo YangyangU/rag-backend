@@ -20,3 +20,8 @@ export class DeleteUserDto {
   role?: 'admin' | 'user';
   usernameToDelete: string;
 }
+
+export class GetUserCountByDateDto {
+  role?: 'admin' | 'user';
+  date: number;
+}

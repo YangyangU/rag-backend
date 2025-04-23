@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, Repository, MoreThanOrEqual } from 'typeorm';
 import { File } from './entities/file.entity';
 import { Knowledge } from '../knowledges/entities/knowledge.entity';
 import {
@@ -9,6 +9,7 @@ import {
   DeleteFilesDto,
   GetFileContentDto,
   GetFileContentByKbIdsDto,
+  GetFileCountByDateDto,
 } from './dto/files.dto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -132,5 +133,48 @@ export class FilesService {
     const contents = files.map((file) => file.content);
 
     return contents;
+  }
+  async getFileCountByDate(
+    getFileCountByDateDto: GetFileCountByDateDto,
+  ): Promise<any> {
+    const { role, date } = getFileCountByDateDto;
+    if (role === 'admin') {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - date); // 当前日期减去指定天数
+
+      // 查询该时间范围内的文件
+      const files = await this.fileRepository.find({
+        where: {
+          createTime: MoreThanOrEqual(startDate.toISOString()), // 查询大于等于startDate的记录
+        },
+      });
+
+      // 按日期分组统计文件数量
+      const dateCountMap = new Map<string, number>();
+      files.forEach((file) => {
+        const date = new Date(file.createTime).toISOString().split('T')[0]; // 获取日期部分
+        if (dateCountMap.has(date)) {
+          dateCountMap.set(date, dateCountMap.get(date) ?? 0 + 1);
+        } else {
+          dateCountMap.set(date, 1);
+        }
+      });
+
+      // 转换为指定格式
+      const result = Array.from(dateCountMap).map(([name, value]) => ({
+        name,
+        value,
+      }));
+
+      return {
+        code: 200,
+        message: '获取文件数量成功',
+        data: result,
+      };
+    }
+    return {
+      code: 403,
+      message: '无权访问知识库统计信息',
+    };
   }
 }

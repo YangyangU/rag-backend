@@ -5,6 +5,7 @@ import {
   LoginUserDto,
   GetUserListDto,
   DeleteUserDto,
+  GetUserCountByDateDto,
 } from './dto/users.dto';
 
 @Controller('users')
@@ -29,5 +30,12 @@ export class UserController {
   @Post('deleteUser')
   async deleteUser(@Body() deleteUserDto: DeleteUserDto) {
     return await this.usersService.deleteUser(deleteUserDto);
+  }
+
+  @Post('getUserCountByDate')
+  async getUserCountByDate(
+    @Body() getUserCountByDateDto: GetUserCountByDateDto,
+  ) {
+    return await this.usersService.getUserCountByDate(getUserCountByDateDto);
   }
 }

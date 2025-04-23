@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not } from 'typeorm';
+import { Repository, Not, MoreThanOrEqual } from 'typeorm';
 import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -12,6 +12,7 @@ import {
   LoginUserDto,
   GetUserListDto,
   DeleteUserDto,
+  GetUserCountByDateDto,
 } from './dto/users.dto';
 
 @Injectable()
@@ -128,6 +129,46 @@ export class UsersService {
     return {
       code: 200,
       message: '删除用户成功',
+    };
+  }
+  async getUserCountByDate(
+    getUserCountByDateDto: GetUserCountByDateDto,
+  ): Promise<any> {
+    const { role, date } = getUserCountByDateDto;
+    if (role === 'admin') {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - date);
+      const users = await this.usersRepository.find({
+        where: {
+          createTime: MoreThanOrEqual(startDate.toISOString()),
+        },
+      });
+      // 按日期分组统计用户数量
+      const dateCountMap = new Map<string, number>();
+      users.forEach((user) => {
+        const date = new Date(user.updateTime).toISOString().split('T')[0]; // 获取日期部分
+        if (dateCountMap.has(date)) {
+          dateCountMap.set(date, dateCountMap.get(date) ?? 0 + 1);
+        } else {
+          dateCountMap.set(date, 1);
+        }
+      });
+
+      // 转换为指定格式
+      const result = Array.from(dateCountMap).map(([name, value]) => ({
+        name,
+        value,
+      }));
+
+      return {
+        code: 200,
+        message: '获取用户数量成功',
+        data: result,
+      };
+    }
+    return {
+      code: 403,
+      message: '无权访问用户列表',
     };
   }
 }

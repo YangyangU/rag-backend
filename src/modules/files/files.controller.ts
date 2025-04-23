@@ -13,6 +13,7 @@ import {
   DeleteFilesDto,
   GetFileContentDto,
   GetFileContentByKbIdsDto,
+  GetFileCountByDateDto,
 } from './dto/files.dto';
 import { fileMulterConfig } from 'src/config/multer.config';
 
@@ -49,5 +50,10 @@ export class FilesController {
     @Body() getFileContentByIds: GetFileContentByKbIdsDto,
   ) {
     return await this.filesService.getFileContentByIds(getFileContentByIds);
+  }
+
+  @Post('getFileCountByDate')
+  async getFileCountByDate(@Body() getFileCountByDate: GetFileCountByDateDto) {
+    return await this.filesService.getFileCountByDate(getFileCountByDate);
   }
 }

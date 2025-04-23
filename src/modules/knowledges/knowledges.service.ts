@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, Repository, MoreThanOrEqual } from 'typeorm';
 import { Knowledge } from './entities/knowledge.entity';
 import {
   CreateKnowledgeDto,
@@ -13,6 +13,7 @@ import {
   DeleteKnowledgeDto,
   GetKnowledgeDto,
   GetKnowledgeListDto,
+  GetKbCountByDateDto,
 } from './dto/knowledges.dto';
 import { randomBytes } from 'crypto';
 
@@ -132,6 +133,50 @@ export class KnowledgeService {
       message: '查询成功',
       data: knowledgeList,
       count: knowledgeList.length,
+    };
+  }
+
+  async getKnowledgeCountByDate(
+    getKbCountByDateDto: GetKbCountByDateDto,
+  ): Promise<any> {
+    const { role, date } = getKbCountByDateDto;
+    if (role === 'admin') {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - date); // 当前日期减去指定天数
+
+      // 查询该时间范围内的知识库
+      const knowledgeList = await this.knowledgesRepository.find({
+        where: {
+          createTime: MoreThanOrEqual(startDate.toISOString()),
+        },
+      });
+
+      // 按日期分组统计知识库数量
+      const dateCountMap = new Map<string, number>();
+      knowledgeList.forEach((knowledge) => {
+        const date = new Date(knowledge.createTime).toISOString().split('T')[0];
+        if (dateCountMap.has(date)) {
+          dateCountMap.set(date, dateCountMap.get(date) ?? 0 + 1);
+        } else {
+          dateCountMap.set(date, 1);
+        }
+      });
+
+      // 转换为指定格式
+      const result = Array.from(dateCountMap).map(([name, value]) => ({
+        name,
+        value,
+      }));
+
+      return {
+        code: 200,
+        message: '获取知识库数量成功',
+        data: result,
+      };
+    }
+    return {
+      code: 403,
+      message: '无权访问知识库统计信息',
     };
   }
 }

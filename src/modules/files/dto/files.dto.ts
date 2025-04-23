@@ -16,3 +16,8 @@ export class GetFileContentDto {
 export class GetFileContentByKbIdsDto {
   kbIds: string[];
 }
+
+export class GetFileCountByDateDto {
+  role: 'admin' | 'user';
+  date: number;
+}
