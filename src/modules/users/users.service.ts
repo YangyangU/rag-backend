@@ -46,12 +46,16 @@ export class UsersService {
       updateTime: new Date().toISOString(),
     });
     await this.usersRepository.save(user);
+
+    const payload = { username: user.username, role: user.role, sub: user.id };
+    const token = this.jwtService.sign(payload);
     return {
       code: 200,
       message: '注册成功',
       data: {
         username: user.username,
         role: user.role,
+        token,
       },
     };
   }
@@ -87,11 +91,9 @@ export class UsersService {
       code: 200,
       message: '登录成功',
       data: {
-        accessToken: token,
-        userInfo: {
-          username: user.username,
-          role: user.role,
-        },
+        username: user.username,
+        role: user.role,
+        token,
       },
     };
   }
